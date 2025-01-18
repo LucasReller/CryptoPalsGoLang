@@ -37,7 +37,7 @@ func computeEditDistance(value1, value2 []byte) int {
 
 	for i := 0; i < length; i++ {
 		temp := uint32(value1[i] ^ value2[i])
-		//Kernighan’s Algorithm
+		//Kernighan’s Algorithm (bitshift right and check if last bit is set until the original value is 0 because of the bit shifting)
 		for temp > 0 {
 			result += temp & 1 // check last bit (1 is equivalent to 0001)
 			temp = temp >> 1
