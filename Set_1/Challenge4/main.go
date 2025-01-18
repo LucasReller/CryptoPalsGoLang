@@ -52,30 +52,28 @@ func scoreEachLetter(encodedValue []byte) ([]byte, float64) {
 
 	for i := 0; i < len(letters); i++ {
 		var vowelCounter int = 0
+		var badCounter int = 0
 
 		for j := 0; j < len(encodedValue); j++ {
 			var charResult = encodedValue[j] ^ letters[i]
 
-			for k := 0; k < len(vowels); k++ {
-				if charResult == vowels[k] {
-					vowelCounter++
-				}
-				if charResult == badChars[k] {
-					vowelCounter += 100 //this is kind of hacky
-				}
+			if strings.Contains(badChars, string(charResult)) {
+				break
+			} else if strings.Contains(vowels, string(charResult)) {
+				vowelCounter++
 			}
+
 			tempBytes[j] = charResult
 		}
-		var currentPercent float64 = float64(vowelCounter) / float64(len(tempBytes))
+		if badCounter == 0 {
+			var currentPercent float64 = float64(vowelCounter) / float64(len(tempBytes))
 
-		//the closer to zero the result of the subtraction is the closer to the target percent, therefore the smaller value is closer
-		if math.Abs(currentPercent-targetPercent) < math.Abs(resultPercent-targetPercent) {
-			resultPercent = currentPercent
+			//the closer to zero the result of the subtraction is the closer to the target percent, therefore the smaller value is closer
+			if math.Abs(currentPercent-targetPercent) < math.Abs(resultPercent-targetPercent) {
+				resultPercent = currentPercent
 
-			//key golang learning form this:
-			//make (see above) makes a slice which contains a pointer to the underlying array, as such assignment will assign by pointer not value leading to undesireable behavior
-			//however when using copy on a slice it will copy to match the size of the largest slice thus the destination array must be of equal or larger size to copy all values
-			copy(resultBytes, tempBytes)
+				copy(resultBytes, tempBytes)
+			}
 		}
 	}
 	return resultBytes, math.Abs(resultPercent - targetPercent)
