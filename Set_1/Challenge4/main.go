@@ -3,28 +3,49 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"log"
 	"math"
+	"os"
+	"strings"
 )
 
-const vowels string = "aeiouy" //these 6 letters account for 39.8% of the characters found in english sentences
-const letters string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
-const targetPercent float64 = 39.8
+const vowels string = "aeiouy"   //these 6 letters account for 39.8% of the characters found in english sentences
+const badChars string = "%|{}[]" //if it contains any of these it cannot be the solution
+const letters string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()`~-_=+[],./<>?{}\\|;:\"'"
+const targetPercent float64 = .398
 
 func main() {
-	hexString := []byte("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+	hexStrings := readInFileByLines()
 
-	hexResult := decodeHex(hexString)
+	hexResult := checkEachLine(hexStrings)
 
-	fmt.Printf("%s", scoreEachLetter(hexResult))
+	fmt.Printf("%s", hexResult)
 }
 
-func decodeHex(src []byte) []byte {
-	dst := make([]byte, hex.DecodedLen(len(src)))
-	hex.Decode(dst, src)
-	return dst
+func readInFileByLines() []string {
+	file, err := os.ReadFile("challenge4-data.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return strings.Split(string(file), "\n")
 }
 
-func scoreEachLetter(encodedValue []byte) []byte {
+func checkEachLine(arr []string) []byte {
+	var resultBytes []byte = make([]byte, 30) //change this from being hardcoded
+	var prevPercent float64 = 1
+	for i := 0; i < len(arr); i++ {
+		bytes, percent := scoreEachLetter(decodeHex([]byte(arr[i])))
+
+		if percent < prevPercent {
+			prevPercent = percent
+			copy(resultBytes, bytes)
+		}
+	}
+	return resultBytes
+}
+
+func scoreEachLetter(encodedValue []byte) ([]byte, float64) {
 	var resultPercent float64 = 0
 	var tempBytes []byte = make([]byte, len(encodedValue))
 	var resultBytes []byte = make([]byte, len(encodedValue))
@@ -38,6 +59,9 @@ func scoreEachLetter(encodedValue []byte) []byte {
 			for k := 0; k < len(vowels); k++ {
 				if charResult == vowels[k] {
 					vowelCounter++
+				}
+				if charResult == badChars[k] {
+					vowelCounter += 100 //this is kind of hacky
 				}
 			}
 			tempBytes[j] = charResult
@@ -54,5 +78,11 @@ func scoreEachLetter(encodedValue []byte) []byte {
 			copy(resultBytes, tempBytes)
 		}
 	}
-	return resultBytes
+	return resultBytes, math.Abs(resultPercent - targetPercent)
+}
+
+func decodeHex(src []byte) []byte {
+	dst := make([]byte, hex.DecodedLen(len(src)))
+	hex.Decode(dst, src)
+	return dst
 }

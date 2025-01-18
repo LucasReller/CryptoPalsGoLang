@@ -8,7 +8,7 @@ import (
 
 const vowels string = "aeiouy" //these 6 letters account for 39.8% of the characters found in english sentences
 const letters string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
-const targetPercent float64 = 39.8
+const targetPercent float64 = .398
 
 func main() {
 	hexString := []byte("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
