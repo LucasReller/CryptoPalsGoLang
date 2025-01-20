@@ -11,7 +11,7 @@ import (
 
 const vowels string = "aeiouy"   //these 6 letters account for 39.8% of the characters found in english sentences
 const badChars string = "%|{}[]" //if it contains any of these it cannot be the solution
-const letters string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()`~-_=+[],./<>?{}\\|;:\"'"
+const letters string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"
 const targetPercent float64 = .398
 
 func main() {
